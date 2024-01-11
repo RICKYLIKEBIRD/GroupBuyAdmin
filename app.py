@@ -32,7 +32,7 @@ handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 # def alive():
 #     return "alive"
 
-@app.route("/api", methods=['POST'])
+@app.route("/api", methods=['POST','GET'])
 def api():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
@@ -42,58 +42,17 @@ def api():
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
 
+    if request.method == 'GET':
+        app.logging.info('get this')
+    else :
     # handle webhook body
-    try:
-        handler.handle(body, signature)
-    except InvalidSignatureError:
-        abort(400)
+        try:
+            handler.handle(body, signature)
+        except InvalidSignatureError:
+            abort(400)
 
-    return 'OK'
-    return {
-        "type": "bubble",
-        "size": "mega",
-        "hero": {
-            "type": "box",
-            "layout": "horizontal",
-            "contents": [
-            {
-                "type": "text",
-                "text": "選個時間吧",
-                "align": "center",
-                "size": "xxl",
-                "color": "#000000"
-            }
-            ],
-            "position": "relative",
-            "action": {
-                "type": "message",
-                "label": "action",
-                "text": "hello"
-            },
-            "backgroundColor": "#0492b3",
-            "spacing": "lg",
-            "flex": 2,
-            "height": "50px",
-            "alignItems": "center"
-        },
-        "body": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [{
-                "type": "button",
-                "action": {
-                "type": "datetimepicker",
-                "label": "請選擇時間",
-                "data": "pickTime",
-                "mode": "date"
-                },
-                "height": "sm"
-            }],
-            "height": "80px",
-            "alignItems": "center",
-            "justifyContent": "center"
-        }
-    }
+        return 'OK'
+    
 
 
 @handler.add(FollowEvent)
